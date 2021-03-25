@@ -395,6 +395,12 @@ func resourceOpennebulaVirtualMachineCreate(d *schema.ResourceData, meta interfa
 		expectedState = "HOLD"
 	}
 
+	//Ensure the state is Running
+	vm, err := vmc.Info(false)
+	for vmState, vmLcmState, _ := vm.State(); vmLcmState.String() == "RUNNING"; _, vmLcmState, _ = vm.State() {
+		fmt.Printf("Sharing info %+v , ... ., %v\n", vmState, vmLcmState)
+	}
+
 	timeout := d.Get("timeout").(int)
 	_, err = waitForVMState(vmc, timeout, expectedState)
 	if err != nil {
